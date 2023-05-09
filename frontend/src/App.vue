@@ -13,10 +13,18 @@ interface BalanceItem {
 
 const map = reactive<{ [id: string]: number }>({})
 
-fetch('http://localhost:8080/overview').then(async r => {
-    let result = await r.json() as BalanceOverview;
-    result.overview.forEach(r => map[r.accountId] = r.balance)
-})
+// setInterval(() => {
+//     fetch('http://localhost:8080/overview').then(async r => {
+//         let result = await r.json() as BalanceOverview;
+//         result.overview.forEach(r => map[r.accountId] = r.balance)
+//     })
+// }, 50)
+
+let eventSource = new EventSource('http://localhost:8080/stream');
+eventSource.onmessage = (ev: any) => {
+    let data = JSON.parse(ev.data);
+    map[data.accountId] = data.balance
+}
 
 </script>
 
@@ -46,8 +54,8 @@ fetch('http://localhost:8080/overview').then(async r => {
                 </thead>
                 <tbody>
                 <tr v-for="(item, id) in map">
-                    <td class="text-end">{{ id }}</td>
-                    <td class="text-end">{{ item.toFixed(2) }}</td>
+                    <td class="text-end">{{id}}</td>
+                    <td class="text-end">{{item.toFixed(2)}}</td>
                 </tr>
                 </tbody>
             </table>
