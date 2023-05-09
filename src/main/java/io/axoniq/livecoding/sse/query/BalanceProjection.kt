@@ -8,28 +8,23 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
-class BalanceProjection(
-    private val queryUpdateEmitter: QueryUpdateEmitter
-) {
+class BalanceProjection {
 
     private val balanceMap: MutableMap<String, Double> = ConcurrentHashMap()
 
     @EventHandler
     fun handle(event: AccountCreatedEvent) {
         balanceMap[event.id] = 0.0
-        queryUpdateEmitter.emit(GetBalanceOverview::class.java, { true }, BalanceItem(event.id, 0.0))
     }
 
     @EventHandler
     fun handle(event: BalanceWithdrawnFromAccountEvent) {
         balanceMap[event.accountId] = event.balance
-        queryUpdateEmitter.emit(GetBalanceOverview::class.java, { true }, BalanceItem(event.accountId, event.balance))
     }
 
     @EventHandler
     fun handle(event: BalanceAddedToAccountEvent) {
         balanceMap[event.accountId] = event.balance
-        queryUpdateEmitter.emit(GetBalanceOverview::class.java, { true }, BalanceItem(event.accountId, event.balance))
     }
 
     @QueryHandler
