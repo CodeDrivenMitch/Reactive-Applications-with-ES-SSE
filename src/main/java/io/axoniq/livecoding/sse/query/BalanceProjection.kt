@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
-class BalanceProjection {
+class BalanceProjection(
+        private val queryUpdateEmitter: QueryUpdateEmitter
+) {
     private val balanceMap: MutableMap<String, Double> = ConcurrentHashMap()
 
     @EventHandler
@@ -20,12 +22,22 @@ class BalanceProjection {
     fun handle(event: BalanceWithdrawnFromAccountEvent) {
         Thread.sleep(DELAY)
         balanceMap[event.accountId] = event.balance
+        queryUpdateEmitter.emit(
+                GetBalanceOverviewForAccount::class.java,
+                { it.accountId == event.accountId },
+                event.balance
+        )
     }
 
     @EventHandler
     fun handle(event: BalanceAddedToAccountEvent) {
         Thread.sleep(DELAY)
         balanceMap[event.accountId] = event.balance
+        queryUpdateEmitter.emit(
+                GetBalanceOverviewForAccount::class.java,
+                { it.accountId == event.accountId },
+                event.balance
+        )
     }
 
     @QueryHandler

@@ -9,7 +9,10 @@ import org.axonframework.commandhandling.gateway.CommandGateway
 import org.axonframework.common.IdentifierFactory
 import org.axonframework.messaging.responsetypes.ResponseTypes
 import org.axonframework.queryhandling.QueryGateway
+import org.axonframework.queryhandling.SubscriptionQueryResult
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
+import reactor.core.publisher.Flux
 import java.util.concurrent.CompletableFuture
 
 @RestController
@@ -35,11 +38,21 @@ class FrontendController(
     }
 
     @GetMapping(path = ["balance/{accountId}"])
-    fun getBalance(@PathVariable accountId: String): CompletableFuture<Double> {
-        return queryGateway.query(
+    fun getBalance(@PathVariable accountId: String): Flux<ServerSentEvent<Double>> {
+        val query = queryGateway.subscriptionQuery(
                 GetBalanceOverviewForAccount(accountId),
                 ResponseTypes.instanceOf(Double::class.java),
+                ResponseTypes.instanceOf(Double::class.java),
         )
+
+        return query.initialResult()
+                .concatWith(query.updates())
+                .map {
+                    ServerSentEvent.builder(it).build()
+                }
+                .doFinally {
+                    query.cancel()
+                }
     }
 
     data class AmountBody(val amount: Double)

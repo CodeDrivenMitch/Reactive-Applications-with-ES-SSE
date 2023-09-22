@@ -16,16 +16,10 @@ const balanceLoading = ref<boolean>(false)
 const error = ref<string | null>(null)
 const success = ref<string | null>(null)
 
-const refreshBalance = async () => {
-  balanceLoading.value = true
-  await fetch('/api/balance/' + props.account)
-      .then(r => r.text())
-      .then(r => {
-        balance.value = parseInt(r);
-        balanceLoading.value = false
-      })
-      .catch(e => error.value = e)
-};
+const source = new EventSource('/api/balance/' + props.account)
+source.onmessage = (e) => {
+  balance.value = parseInt(e.data)
+}
 
 const setResult = (ok: boolean, text: string) => {
   success.value = null
@@ -74,8 +68,6 @@ const withdraw = async () => {
     withdrawLoading.value = false
   })
 };
-
-onMounted(refreshBalance)
 </script>
 
 <template>
@@ -85,9 +77,6 @@ onMounted(refreshBalance)
   </p>
   <p>
     Balance: <span v-if="balance === null || balanceLoading">Loading...</span><span v-else>${{ balance.toFixed(2) }}</span>
-  </p>
-  <p>
-    <button type="button" class="btn btn-primary btn-sm" @click.prevent="refreshBalance()" :disabled="balanceLoading">Refresh Balance</button>
   </p>
   <hr/>
   <div v-if="error">
