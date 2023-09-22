@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class BalanceProjection {
-
     private val balanceMap: MutableMap<String, Double> = ConcurrentHashMap()
 
     @EventHandler
@@ -19,16 +18,27 @@ class BalanceProjection {
 
     @EventHandler
     fun handle(event: BalanceWithdrawnFromAccountEvent) {
+        Thread.sleep(DELAY)
         balanceMap[event.accountId] = event.balance
     }
 
     @EventHandler
     fun handle(event: BalanceAddedToAccountEvent) {
+        Thread.sleep(DELAY)
         balanceMap[event.accountId] = event.balance
     }
 
     @QueryHandler
     fun handle(query: GetBalanceOverview): BalanceOverview {
         return BalanceOverview(balanceMap.entries.map { BalanceItem(it.key, it.value) })
+    }
+
+    @QueryHandler
+    fun handle(query: GetBalanceOverviewForAccount): Double {
+        return balanceMap[query.accountId] ?: 0.0
+    }
+
+    companion object {
+        public var DELAY = 0L
     }
 }

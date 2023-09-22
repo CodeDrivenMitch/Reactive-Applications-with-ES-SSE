@@ -7,7 +7,7 @@ data class CreateAccountCommand(
     val id: String,
 )
 
-data class AddBalanceToAccountCommand(
+data class DepositToAccountCommand(
     @TargetAggregateIdentifier
     val accountId: String,
     val amount: Double,

@@ -30,7 +30,7 @@ class Account() {
     }
 
     @CommandHandler
-    fun handle(command: AddBalanceToAccountCommand) {
+    fun handle(command: DepositToAccountCommand) {
         if (command.amount < 0) {
             throw IllegalArgumentException("Can not add a negative amount! You rascal.")
         }

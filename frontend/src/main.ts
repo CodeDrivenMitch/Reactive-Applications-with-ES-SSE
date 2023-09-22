@@ -9,3 +9,8 @@ import "bootstrap"
 const app = createApp(App)
 
 app.mount('#app')
+
+
+window.setDelay = function (delay) {
+    fetch('/api/delay/' + delay, {method: 'PUT'})
+}

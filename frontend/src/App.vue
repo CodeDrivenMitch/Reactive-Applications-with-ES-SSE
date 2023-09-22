@@ -1,57 +1,31 @@
 <script setup lang="ts">
 
-import {onMounted, reactive} from "vue";
+import Header from "@/components/Header.vue";
+import {ref} from "vue";
+import BankAccount from "@/components/BankAccount.vue";
 
-interface BalanceOverview {
-    overview: BalanceItem[],
+const account = ref<string | null>(null)
+
+const createAccount = async () => {
+  const r = await fetch("/api/account", {method: "POST"})
+  account.value = await r.text()
 }
-
-interface BalanceItem {
-    accountId: string,
-    balance: number,
-}
-
-const map = reactive<{ [id: string]: number }>({})
-
-fetch('http://localhost:8080/overview').then(async r => {
-    let result = await r.json() as BalanceOverview;
-    result.overview.forEach(r => map[r.accountId] = r.balance)
-})
 
 </script>
 
 <template>
-    <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container-fluid px-3">
-                <a class="navbar-brand" href="/"><img src="./assets/logo.svg" alt="" width="30" height="24">Axon SSE
-                    Livecoding Demo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+  <div class="container-fluid">
+    <Header/>
 
-
-            </div>
-        </nav>
-
-        <div class="bg-white mt-4 p-4">
-            <table class="table table-responsive">
-                <thead>
-                <tr>
-                    <th class="text-end">Account</th>
-                    <th class="text-end">Balance</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, id) in map">
-                    <td class="text-end">{{ id }}</td>
-                    <td class="text-end">{{ item.toFixed(2) }}</td>
-                </tr>
-                </tbody>
-            </table>
-
-        </div>
+    <div class="bg-white m-2 mt-4 p-2 py-4 text-center" v-if="!account">
+      <h1>Welcome to AxonIQ Bank!</h1>
+      <p>You can sign up for an account and then use your account.</p>
+      <button type="button" class="btn btn-primary me-4" @click.prevent="createAccount()">Create an account</button>
     </div>
+
+    <div class="bg-white m-2 mt-4 p-2 py-4 text-center" v-else>
+      <BankAccount :account="account"></BankAccount>
+    </div>
+
+  </div>
 </template>
