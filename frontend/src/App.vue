@@ -1,21 +1,19 @@
 <script setup lang="ts">
 
 import Header from "@/components/Header.vue";
-import {ref} from "vue";
-import BankAccount from "@/components/BankAccount.vue";
+import BankAccount from "@/BankAccount.vue";
+import Messages from "@/components/Messages.vue";
+import {storeToRefs} from "pinia";
+import {useAccountStore} from "@/stores/account";
 
-const account = ref<string | null>(null)
-
-const createAccount = async () => {
-  const r = await fetch("/api/account", {method: "POST"})
-  account.value = await r.text()
-}
-
+const {account} = storeToRefs(useAccountStore())
+const {createAccount} = useAccountStore()
 </script>
 
 <template>
   <div class="container-fluid">
     <Header/>
+    <Messages/>
 
     <div class="bg-white m-2 mt-4 p-2 py-4 text-center" v-if="!account">
       <h1>Welcome to AxonIQ Bank!</h1>
@@ -24,7 +22,7 @@ const createAccount = async () => {
     </div>
 
     <div class="bg-white m-2 mt-4 p-2 py-4 text-center" v-else>
-      <BankAccount :account="account"></BankAccount>
+      <BankAccount></BankAccount>
     </div>
 
   </div>
