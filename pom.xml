@@ -28,6 +28,7 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.2</version>
     </parent>
+    <packaging>pom</packaging>
 
     <properties>
         <java.version>17</java.version>
@@ -35,6 +36,12 @@
         <kotlin.version>1.9.0</kotlin.version>
         <h2.version>1.4.200</h2.version>
     </properties>
+
+    <modules>
+        <module>api</module>
+        <module>service-main</module>
+        <module>service-secondary</module>
+    </modules>
 
     <dependencies>
         <dependency>

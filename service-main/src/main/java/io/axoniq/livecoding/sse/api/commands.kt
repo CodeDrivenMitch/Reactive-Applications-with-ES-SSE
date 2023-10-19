@@ -2,9 +2,7 @@ package io.axoniq.livecoding.sse.api
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier
 
-data class CreateAccountCommand(
-    val id: String,
-)
+class CreateAccountCommand
 
 data class DepositToAccountCommand(
     @TargetAggregateIdentifier
