@@ -11,12 +11,3 @@ services:
       axoniq_axonserver_hostname: axon-server
       axoniq_axonserver_autocluster_first: axon-server
       axoniq_axonserver_autocluster_contexts: _admin,default
-    volumes:
-      - data:/axonserver/data
-      - events:/axonserver/events
-
-volumes:
-  data:
-    driver: local
-  events:
-    driver: local
